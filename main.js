@@ -2775,7 +2775,7 @@ var BigBoardView = class extends ShellItemView {
     const bar = r.actionsEl.createDiv({ cls: "sdd-big__bar" });
     bar.createSpan({
       cls: "sdd-big__hint",
-      text: "Whole initiatives \u2014 broad strokes. Implementation cards stay on the Dev Dashboard."
+      text: "Whole initiatives \u2014 broad strokes. Implementation cards stay on the Dev Board."
     });
     const addBtn = bar.createEl("button", { cls: "mod-cta", text: "+ Add an initiative" });
     addBtn.addEventListener(
@@ -2787,7 +2787,7 @@ var BigBoardView = class extends ShellItemView {
         }
       }).open()
     );
-    const boardBtn = bar.createEl("button", { text: "Dev Dashboard \u25B8" });
+    const boardBtn = bar.createEl("button", { text: "Dev Board \u25B8" });
     boardBtn.addEventListener("click", () => p.activateView());
     this.renderGrid(r.contentEl);
     this.renderRecommendations(r.contentEl);
