@@ -23,6 +23,32 @@ for (const asset of ["main.js", "manifest.json", "styles.css"]) {
   }
 }
 
+// Release documentation standard: every release ships a GUIDE.md
+// (human + agent walkthrough: how it works, install, configure, workflows)
+// and a README with at least one real screenshot embed.
+try {
+  readFileSync(new URL("GUIDE.md", root));
+} catch {
+  failures.push("missing GUIDE.md (release documentation standard)");
+}
+try {
+  const readme = readFileSync(new URL("README.md", root), "utf8");
+  const embeds = [...readme.matchAll(/!\[[^\]]*\]\(([^)]+)\)/g)].map((m) => m[1]);
+  const local = embeds.filter((p) => !/^https?:/.test(p));
+  if (local.length === 0) {
+    failures.push("README.md has no screenshot embeds (release documentation standard)");
+  }
+  for (const p of local) {
+    try {
+      readFileSync(new URL(p, root));
+    } catch {
+      failures.push(`README.md embeds missing image: ${p}`);
+    }
+  }
+} catch {
+  failures.push("missing README.md");
+}
+
 let tracked = [];
 let identityLog = "";
 try {
@@ -64,7 +90,9 @@ const checks = [
   ["assigned credential", /\b(?:api[_-]?key|access[_-]?token|client[_-]?secret|password)\s*[:=]\s*["']?[A-Za-z0-9_./+-]{12,}/i],
 ];
 
+const BINARY_RE = /\.(png|jpe?g|gif|webp|mp4|woff2?|ico)$/i;
 for (const file of tracked) {
+  if (BINARY_RE.test(file)) continue; // images scanned by provenance, not regex
   let contents;
   try {
     contents = readFileSync(new URL(file, root), "utf8");

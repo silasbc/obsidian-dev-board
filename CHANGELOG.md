@@ -17,3 +17,4 @@ Release verification:
 2. Confirm `git diff --exit-code -- main.js` after the release build is committed.
 3. Scan every reachable Git object, not only the working tree, for private paths, private hostnames, emails, and credential shapes.
 4. Attach `main.js`, `manifest.json`, and `styles.css` to the GitHub release whose tag exactly matches the manifest version.
+5. Documentation standard (gate-enforced): the release ships `GUIDE.md` — a walkthrough for humans and agents covering how it works, install, vault configuration, and the workflows it enables — and `README.md` embeds current screenshots captured from a sanitized demo vault, never a live one.

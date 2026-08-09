@@ -8,11 +8,20 @@ The board is plain JSON in your vault. You work it visually — drag cards throu
 
 Plain files first: every card can own a normal Markdown note in your vault (spec, screenshots, feedback trail), and the board record is readable JSON you can grep, diff, and back up.
 
+**New here? Read the [Guide](GUIDE.md)** — a walkthrough for humans *and* agents: how it works, install, configuring it for your vault, and the workflows it enables. Agents wiring themselves to the board read [AGENTS.md](AGENTS.md) for the exact write contract.
+
+![The Dev Board — capture bar, dev-cycle columns, owner/agent chips, session debriefs](docs/board.png)
+
 ## The three surfaces
 
 - **Dev Board** (ribbon icon, command palette, or `obsidian://dev-board`) — the kanban board. Quick-capture bar, drag-and-drop columns, search, per-card modal with an embedded editor for the card's note, pasted screenshots, history.
 - **Dev Board Review** (`obsidian://dev-board-review`) — a click-through room that works one column card by card: the card + spec + every link on it on the left, the rendered card note on the right, and a route bar (Approve, Needs work with required feedback, Not sold, Reject, one-click Undo). `obsidian://dev-board-triage` opens the same room over the backlog.
+
+  ![The review room — origin and feedback on the left, the rendered card note with Your next step on the right](docs/review.png)
+
 - **Big Board** (`obsidian://dev-board-big`) — a higher-altitude portfolio kanban: initiatives in theme lanes, each linked to its implementation cards with a live "N in flight / M shipped" chip.
+
+  ![The Big Board — initiatives in lanes with live in-flight/shipped counts](docs/big-board.png)
 
 ## The dev cycle
 
