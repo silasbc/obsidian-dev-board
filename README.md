@@ -74,7 +74,9 @@ Everything is local. The plugin makes no network requests.
 
 ## Privacy & security
 
-No telemetry, no network calls, no external services. The only thing the plugin writes outside its configured folder is nothing.
+The plugin contains no telemetry, API client, or background network service. Clicking an external link—or rendering a card note that deliberately embeds a remote Markdown asset—can still ask Obsidian to open or retrieve that resource.
+
+Public releases use a three-door privacy gate: the tracked pre-push hook, `npm run release:check`, and GitHub Actions all run the same scanner over the current tree **and every reachable historical blob**. Binary assets require a SHA-256 entry in `.privacy-assets.json` after original-resolution visual review; PNG/JPEG metadata is rejected. Run `npm run privacy:install-hook` once after cloning this repository.
 
 ## License
 

@@ -1,0 +1,26 @@
+{
+  "version": 1,
+  "assets": {
+    "27ada1b54d40be8c0d2f00c847a38dbdbbde4f677455d6458af44a282f2c72d7": {
+      "reviewed": "2026-08-09",
+      "source": "Sanitized fictional demo vault; original-resolution visual review and PNG metadata inspection",
+      "files": [
+        "docs/big-board.png"
+      ]
+    },
+    "acbcd53feec45a1852da197ff3d516936eb2083e26831f63056a4dd3bbe71f6d": {
+      "reviewed": "2026-08-09",
+      "source": "Sanitized fictional demo vault; original-resolution visual review and PNG metadata inspection",
+      "files": [
+        "docs/board.png"
+      ]
+    },
+    "5af5e449ff9542a9da70911bb34d6c5ea52f70d2e4ee7552886bc3c35ae83289": {
+      "reviewed": "2026-08-09",
+      "source": "Sanitized fictional demo vault; original-resolution visual review and PNG metadata inspection",
+      "files": [
+        "docs/review.png"
+      ]
+    }
+  }
+}

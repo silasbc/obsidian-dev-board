@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+REPO_ROOT="$(git rev-parse --show-toplevel)"
+cd "${REPO_ROOT}"
+
+echo "Select public-release gate: checking current tree, full reachable history, and reviewed binary assets..."
+npm run release:check
