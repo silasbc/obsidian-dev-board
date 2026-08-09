@@ -1,0 +1,14 @@
+{
+  "name": "dev-board",
+  "version": "1.0.0",
+  "description": "Dev Board plugin for Obsidian — an agent-friendly kanban dev-cycle board over plain JSON records.",
+  "scripts": {
+    "build": "esbuild src/main.js --bundle --format=cjs --platform=node --target=es2020 --external:obsidian --external:electron --outfile=main.js",
+    "check": "node --check src/main.js && node --check src/shell.js && node scripts/smoke-test.cjs && node scripts/release-check.mjs",
+    "release:check": "npm run build && npm run check"
+  },
+  "license": "MIT",
+  "devDependencies": {
+    "esbuild": "^0.24.0"
+  }
+}

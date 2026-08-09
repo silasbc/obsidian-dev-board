@@ -1,0 +1,23 @@
+# Dev Board release gate: the same build + smoke + sanitization + identity +
+# asset checks that guard manual releases, run on every public change so a
+# future release can never skip the privacy gate.
+name: release-check
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  release-check:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # identity check reads full history
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+      - run: bun install --frozen-lockfile
+      - run: npm run release:check
+      - run: node scripts/release-check.mjs --self-test

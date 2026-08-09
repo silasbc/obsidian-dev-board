@@ -1,0 +1,1048 @@
+/* Dev Board — surface shell, status line, and health marker. */
+
+body {
+  --dvb-accent: #d84f3f;
+  --dvb-positive: #2f8f59;
+  --dvb-warn: #b7791f;
+  --dvb-info: var(--text-accent);
+}
+
+/* Compact settings gear — config link in the header, no vertical cost. */
+.dvb-surface__gear {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  align-self: center;
+  width: 22px;
+  height: 22px;
+  min-height: 0;
+  padding: 0;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  box-shadow: none;
+  color: var(--text-muted);
+  cursor: pointer;
+}
+
+.dvb-surface__gear:hover {
+  color: var(--text-normal);
+  background: var(--background-modifier-hover);
+}
+
+.dvb-surface__gear svg {
+  width: 14px;
+  height: 14px;
+}
+
+/* Surface shell */
+.dvb-surface {
+  padding: 0.75rem 1.25rem 1.25rem;
+  max-width: 1180px;
+  margin: 0 auto;
+}
+
+.dvb-surface__header {
+  display: flex;
+  align-items: baseline;
+  gap: 0.75rem;
+  border-bottom: 1px solid var(--background-modifier-border);
+  padding-bottom: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.dvb-surface__titlewrap { display: flex; align-items: baseline; gap: 0.5rem; flex: 1; }
+
+.dvb-surface__title { margin: 0; font-size: 1.1rem; }
+
+.dvb-surface__stage {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  background: var(--background-modifier-hover);
+  border-radius: 4px;
+  padding: 1px 6px;
+}
+
+.dvb-surface__actions { display: flex; gap: 0.5rem; flex-wrap: wrap; align-items: center; margin-bottom: 0.75rem; }
+
+.dvb-surface__content { display: flex; flex-direction: column; gap: 0.75rem; }
+
+.dvb-surface__maintenance { margin-top: 1rem; }
+
+.dvb-surface__maintenance summary { cursor: pointer; color: var(--text-muted); font-size: 0.85rem; }
+
+.dvb-surface__maintenance-body { display: flex; flex-direction: column; gap: 0.6rem; padding-top: 0.6rem; }
+
+.dvb-surface__status { margin-top: 0.75rem; min-height: 1.2em; font-size: 0.82rem; }
+
+.dvb-status--ok { color: var(--text-success, var(--color-green)); }
+.dvb-status--warn { color: var(--text-warning, var(--color-yellow)); }
+.dvb-status--error { color: var(--text-error, var(--color-red)); }
+.dvb-status--info { color: var(--text-muted); }
+
+.dvb-health { display: inline-flex; align-items: center; gap: 0.35rem; font-size: 0.82rem; }
+.dvb-health__dot { width: 9px; height: 9px; border-radius: 50%; background: var(--text-muted); }
+.dvb-health--healthy .dvb-health__dot { background: var(--color-green); }
+.dvb-health--needs_review .dvb-health__dot { background: var(--color-yellow); }
+.dvb-health--broken .dvb-health__dot { background: var(--color-red); }
+.dvb-health__reason { color: var(--text-muted); }
+
+/* Dev Board — board styles. All rules scoped under sdd- classes inside the
+   dvb- surface shell (defined above). */
+
+/* Quick capture */
+.dvb-surface .sdd-capture {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+.dvb-surface .sdd-capture__input {
+  flex: 1 1 auto;
+  min-width: 120px;
+}
+.dvb-surface .sdd-capture__subsystem {
+  flex: 0 1 190px;
+  min-width: 150px;
+}
+.dvb-surface .sdd-actionbtns {
+  display: flex;
+  gap: 8px;
+}
+
+/* Board */
+.sdd-board {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  overflow-x: auto;
+  padding-bottom: 6px;
+}
+.sdd-col {
+  flex: 1 0 218px;
+  min-width: 218px;
+  max-width: 340px;
+  border: 1px solid var(--background-modifier-border);
+  border-radius: 10px;
+  background: var(--background-secondary);
+  display: flex;
+  flex-direction: column;
+  /* ≈10 cards tall before the column scrolls internally (card ~118px + 8px gap),
+     so the meeting-notes section sits below a 10-card board. */
+  max-height: 1310px;
+}
+.sdd-col--over {
+  border-color: var(--interactive-accent);
+  background: color-mix(in srgb, var(--interactive-accent) 7%, var(--background-secondary));
+}
+.sdd-col__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--background-modifier-border);
+}
+.sdd-col__label {
+  font-size: 0.78rem;
+  font-weight: 750;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+.sdd-col--recommended .sdd-col__label {
+  color: var(--interactive-accent);
+}
+.sdd-col__count {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  background: var(--background-modifier-hover);
+  border-radius: 999px;
+  padding: 1px 8px;
+}
+.sdd-col__body {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 8px;
+  overflow-y: auto;
+  min-height: 60px;
+}
+.sdd-col__empty {
+  color: var(--text-faint);
+  text-align: center;
+  padding: 14px 0;
+  font-size: 0.85rem;
+}
+
+/* Cards */
+.sdd-card {
+  border: 1px solid var(--background-modifier-border);
+  border-radius: 8px;
+  background: var(--background-primary);
+  padding: 9px 10px 7px;
+  cursor: grab;
+}
+.sdd-card--agent {
+  border-color: color-mix(in srgb, var(--interactive-accent) 45%, var(--background-modifier-border));
+  background: color-mix(in srgb, var(--interactive-accent) 6%, var(--background-primary));
+}
+.sdd-card--dragging {
+  opacity: 0.5;
+}
+.sdd-card__title {
+  font-weight: 650;
+  font-size: 0.92rem;
+  line-height: 1.3;
+  cursor: pointer;
+  overflow-wrap: anywhere;
+}
+.sdd-card__title:hover {
+  color: var(--interactive-accent);
+}
+.sdd-card__summary {
+  color: var(--text-muted);
+  font-size: 0.82rem;
+  line-height: 1.35;
+  margin-top: 4px;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  overflow-wrap: anywhere;
+}
+.sdd-card__nextstep {
+  color: var(--text-faint);
+  font-size: 0.78rem;
+  line-height: 1.3;
+  margin-top: 4px;
+  cursor: pointer;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.sdd-card__nextstep:hover {
+  color: var(--text-muted);
+}
+.sdd-card__nextstep:empty {
+  display: none;
+}
+.sdd-textlink {
+  color: var(--interactive-accent);
+  text-decoration: underline;
+  text-decoration-color: color-mix(in srgb, var(--interactive-accent) 45%, transparent);
+  cursor: pointer;
+}
+.sdd-modal .sdd-modal__nextsteps:not(:empty) {
+  margin-top: 10px;
+}
+.sdd-modal .sdd-modal__nextsteps ol {
+  margin: 4px 0 0;
+  padding-left: 20px;
+  font-size: 0.85rem;
+}
+.sdd-card__chips {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 5px;
+  margin-top: 7px;
+}
+.sdd-chip {
+  font-size: 0.7rem;
+  font-weight: 650;
+  border-radius: 999px;
+  padding: 1px 8px;
+  background: var(--background-modifier-hover);
+  color: var(--text-muted);
+  white-space: nowrap;
+  /* A chip longer than the card (long project/subsystem names) must ellipsize,
+     not push the card wide and register horizontal scroll in the column. */
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.sdd-chip--id {
+  font-family: var(--font-monospace);
+  font-weight: 500;
+  letter-spacing: -0.01em;
+}
+.sdd-chip--agent {
+  background: color-mix(in srgb, var(--interactive-accent) 16%, transparent);
+  color: var(--interactive-accent);
+}
+.sdd-chip--placed {
+  background: color-mix(in srgb, var(--color-green) 16%, transparent);
+  color: var(--color-green);
+}
+.sdd-chip--toreview {
+  background: color-mix(in srgb, var(--text-warning) 16%, transparent);
+  color: var(--text-warning);
+}
+.sdd-chip--project {
+  cursor: pointer;
+  text-decoration: underline;
+  text-decoration-color: color-mix(in srgb, var(--text-muted) 40%, transparent);
+}
+.sdd-chip--project:hover {
+  color: var(--interactive-accent);
+}
+.sdd-card__age {
+  margin-left: auto;
+  font-size: 0.7rem;
+  color: var(--text-faint);
+  white-space: nowrap;
+}
+.sdd-card__foot {
+  display: flex;
+  gap: 4px;
+  justify-content: flex-end;
+  margin-top: 6px;
+}
+.sdd-card__foot .sdd-move {
+  font-size: 0.72rem;
+  padding: 1px 8px;
+  height: auto;
+  line-height: 1.5;
+  box-shadow: none;
+  background: transparent;
+  border: 1px solid var(--background-modifier-border);
+  color: var(--text-muted);
+}
+.sdd-card__foot .sdd-move:hover:not(:disabled) {
+  color: var(--text-normal);
+  border-color: var(--interactive-accent);
+}
+.sdd-card__foot .sdd-move:disabled {
+  opacity: 0.35;
+}
+
+/* Meeting notes */
+.sdd-notes {
+  margin-top: 18px;
+  border: 1px solid var(--background-modifier-border);
+  border-radius: 10px;
+  background: var(--background-secondary);
+}
+.sdd-notes__head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 12px;
+  border-bottom: 1px solid var(--background-modifier-border);
+}
+.sdd-notes__title {
+  font-size: 0.78rem;
+  font-weight: 750;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+.sdd-notes__sub {
+  color: var(--text-faint);
+  font-size: 0.78rem;
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.sdd-notes__list {
+  display: flex;
+  flex-direction: column;
+}
+.sdd-noterow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 7px 12px;
+  border-top: 1px solid color-mix(in srgb, var(--background-modifier-border) 60%, transparent);
+}
+.sdd-noterow:first-child {
+  border-top: none;
+}
+.sdd-noterow__date {
+  font-size: 0.74rem;
+  color: var(--text-faint);
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+.sdd-noterow__body {
+  flex: 1 1 auto;
+  min-width: 0;
+  font-size: 0.86rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.sdd-noterow__title {
+  font-weight: 650;
+}
+.sdd-noterow__sum {
+  color: var(--text-muted);
+}
+.sdd-noterow__promote {
+  font-size: 0.78rem;
+  padding: 2px 10px;
+  height: auto;
+}
+
+/* Empty / stats / modal */
+.sdd-empty {
+  padding: 28px 0;
+  text-align: center;
+}
+.sdd-empty__title {
+  font-weight: 700;
+}
+.sdd-empty__sub {
+  color: var(--text-muted);
+  font-size: 0.85rem;
+}
+.sdd-stats {
+  color: var(--text-muted);
+  font-size: 0.84rem;
+  margin-bottom: 8px;
+}
+.sdd-maint__btns {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+/* Widen the card modal window (desktop; mobile modals are full-width already). */
+.modal.sdd-modal-window {
+  width: min(860px, 92vw);
+  max-width: 92vw;
+}
+.sdd-modal .sdd-modal__meta {
+  color: var(--text-faint);
+  font-size: 0.78rem;
+  margin-bottom: 10px;
+}
+.sdd-modal .sdd-modal__title {
+  width: 100%;
+  font-size: 1rem;
+  font-weight: 650;
+  margin-bottom: 8px;
+}
+.sdd-modal .sdd-modal__summary {
+  width: 100%;
+  resize: vertical;
+  margin-bottom: 8px;
+}
+.sdd-modal .sdd-modal__details {
+  width: 100%;
+  resize: vertical;
+  margin-bottom: 8px;
+  font-size: 0.86rem;
+}
+.sdd-chip--details {
+  cursor: help;
+}
+/* Big Board initiative on the card face. */
+.sdd-chip--initiative {
+  cursor: pointer;
+  color: var(--interactive-accent);
+  border-color: color-mix(in srgb, var(--interactive-accent) 35%, transparent);
+  max-width: 14em;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.sdd-initiativefilter {
+  max-width: 13em;
+}
+/* Reversal button: visually distinct from Save. */
+.sdd-modal__revert {
+  color: var(--dvb-warn, #b7791f);
+  border-color: color-mix(in srgb, var(--dvb-warn, #b7791f) 40%, transparent);
+}
+.sdd-modal .sdd-modal__row {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 8px;
+}
+.sdd-modal .sdd-modal__field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1 1 180px;
+}
+.sdd-modal .sdd-modal__field label {
+  font-size: 0.76rem;
+  color: var(--text-muted);
+}
+.sdd-modal .sdd-modal__btns {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+  margin-top: 12px;
+}
+.sdd-modal .sdd-modal__notes {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-top: 8px;
+}
+.sdd-modal .sdd-modal__notes-label {
+  color: var(--text-muted);
+  font-size: 0.76rem;
+  margin-right: 2px;
+}
+.sdd-modal .sdd-modal__note-link {
+  height: auto;
+  padding: 3px 9px;
+  font-size: 0.78rem;
+}
+.sdd-modal .sdd-modal__hist {
+  margin-top: 12px;
+  color: var(--text-muted);
+  font-size: 0.8rem;
+}
+.sdd-modal .sdd-modal__histrow {
+  padding: 2px 0;
+}
+
+/* Mobile: single-column stack, board scrolls horizontally already; loosen heights */
+@media (max-width: 600px) {
+  .sdd-col {
+    flex-basis: 240px;
+    min-width: 240px;
+    max-height: none;
+  }
+  .dvb-surface .sdd-capture {
+    flex-wrap: wrap;
+  }
+}
+
+/* Card screenshots (paste to attach) */
+.sdd-modal__images { margin: 8px 0 4px; }
+.sdd-modal__images-label { display: block; font-size: 0.74rem; color: var(--text-muted); margin-bottom: 6px; }
+.sdd-modal__thumbs { display: flex; flex-wrap: wrap; gap: 8px; }
+.sdd-modal__thumbs-empty { font-size: 0.78rem; color: var(--text-faint); }
+.sdd-modal__thumb { position: relative; }
+.sdd-modal__thumb img {
+  width: 88px; height: 66px; object-fit: cover;
+  border-radius: 6px; border: 1px solid var(--background-modifier-border);
+  cursor: pointer; display: block;
+}
+.sdd-modal__thumb-x {
+  position: absolute; top: -6px; right: -6px;
+  width: 18px; height: 18px; padding: 0; line-height: 1;
+  border-radius: 50%; font-size: 0.62rem;
+  background: var(--background-primary); border: 1px solid var(--background-modifier-border);
+  box-shadow: none; cursor: pointer;
+}
+.sdd-chip--images { color: var(--interactive-accent); }
+
+/* Card note (file-backed card) */
+.sdd-modal__notefile { margin: 8px 0 4px; }
+.sdd-modal__notefile-head { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; }
+.sdd-modal__notefile-head button { font-size: 0.76rem; padding: 2px 10px; }
+.sdd-modal__notebody {
+  width: 100%; font-family: var(--font-monospace); font-size: 0.78rem;
+  border: 1px solid var(--background-modifier-border); border-radius: 6px;
+  background: var(--background-primary); resize: vertical;
+}
+.sdd-chip--file { color: var(--interactive-accent); cursor: pointer; }
+.sdd-chip--feedback { color: var(--text-warning); border-color: color-mix(in srgb, var(--text-warning) 45%, transparent); font-weight: 700; }
+.sdd-modal__notetab { font-size: 0.76rem; padding: 2px 10px; opacity: 0.65; }
+.sdd-modal__notetab.is-active { opacity: 1; border-color: var(--interactive-accent); color: var(--interactive-accent); }
+.sdd-modal__notepreview {
+  max-height: 420px; overflow-y: auto; padding: 10px 14px;
+  border: 1px solid var(--background-modifier-border); border-radius: 6px;
+  background: var(--background-primary); font-size: 0.86rem;
+}
+.sdd-modal__feedback { margin: 8px 0 4px; }
+.sdd-modal__feedbackbody {
+  width: 100%; margin-top: 6px; font-size: 0.84rem;
+  border: 1px solid color-mix(in srgb, var(--text-warning) 40%, transparent); border-radius: 6px;
+  background: var(--background-primary); resize: vertical;
+}
+
+/* Mobile: the card edit modal has many fields; bound its height and let it
+   scroll. contentEl carries .sdd-modal (= .modal-content). */
+.is-mobile .sdd-modal {
+  max-height: 85vh;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+/* …and give the card-note editor real room on a phone — the fixed 14 rows at
+   mono 0.78rem was unreadable; scrolling to the
+   bottom buttons in exchange for reading room, so these run tall. */
+.is-mobile .sdd-modal__notebody {
+  min-height: 65vh;
+  font-size: 1rem;
+  line-height: 1.5;
+}
+.is-mobile .sdd-modal__notepreview {
+  max-height: none;
+  font-size: 1rem;
+}
+.is-mobile .sdd-modal__summary,
+.is-mobile .sdd-modal__details,
+.is-mobile .sdd-modal__feedbackbody {
+  font-size: 1rem;
+  min-height: 9em;
+}
+
+/* Full-screen screenshot lightbox */
+.sdd-lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: var(--layer-modal, 60);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: rgba(0, 0, 0, 0.82);
+  cursor: zoom-out;
+}
+.sdd-lightbox img {
+  max-width: 96vw;
+  max-height: 92vh;
+  border-radius: 8px;
+  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.6);
+}
+.sdd-review__note img,
+.sdd-review__image,
+.sdd-modal__notepreview img {
+  cursor: zoom-in;
+}
+
+/* ── Dev Board Review — click-through review room ── */
+.sdd-review__bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.sdd-review__queuesel {
+  font-size: 0.78rem;
+  max-width: 220px;
+}
+.sdd-review__progress {
+  font-weight: 650;
+  font-size: 0.85rem;
+  white-space: nowrap;
+}
+.sdd-review__dots {
+  display: flex;
+  gap: 3px;
+  flex-wrap: wrap;
+}
+.sdd-review__dot {
+  min-width: 26px;
+  padding: 1px 6px;
+  font-size: 0.72rem;
+  border-radius: 999px;
+  background: var(--background-modifier-hover);
+  color: var(--text-muted);
+}
+.sdd-review__dot.is-current {
+  background: var(--interactive-accent);
+  color: var(--text-on-accent);
+  font-weight: 700;
+}
+.sdd-review__scope,
+.sdd-review__board {
+  margin-left: auto;
+  font-size: 0.78rem;
+}
+.sdd-review__board { margin-left: 0; }
+.sdd-review__grid {
+  display: grid;
+  grid-template-columns: minmax(280px, 5fr) minmax(280px, 7fr);
+  gap: 14px;
+  align-items: start;
+  margin-top: 10px;
+}
+@media (max-width: 760px) {
+  .sdd-review__grid { grid-template-columns: 1fr; }
+  .sdd-review__dots { display: none; }
+}
+.sdd-review__cardpane,
+.sdd-review__notepane {
+  border: 1px solid var(--background-modifier-border);
+  border-radius: 10px;
+  padding: 12px 14px;
+  background: var(--background-primary);
+  min-width: 0;
+}
+.sdd-review__title {
+  margin: 0 0 6px;
+  font-size: 1.05rem;
+  line-height: 1.3;
+}
+/* Card text is referenceable: selectable in the review room */
+.sdd-review__cardpane .sdd-review__title,
+.sdd-review__cardpane .sdd-review__summary,
+.sdd-review__cardpane .sdd-review__specbody,
+.sdd-review__notepane {
+  -webkit-user-select: text;
+  user-select: text;
+  cursor: text;
+}
+/* ── "Your next step" action block ── */
+.sdd-nextsteps {
+  margin: 14px 0;
+  border: 1px solid var(--interactive-accent);
+  border-radius: 10px;
+  overflow: hidden;
+  background: color-mix(in srgb, var(--interactive-accent) 6%, var(--background-primary));
+}
+.sdd-nextsteps__banner {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: color-mix(in srgb, var(--interactive-accent) 14%, var(--background-primary));
+  font-weight: 600;
+  font-size: 0.92rem;
+  color: var(--text-normal);
+}
+.sdd-nextsteps__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--interactive-accent);
+  color: var(--text-on-accent);
+  font-size: 0.8rem;
+  flex: none;
+}
+.sdd-nextsteps__body {
+  padding: 4px 14px 10px;
+}
+.sdd-nextsteps__body ol {
+  margin: 6px 0 2px;
+  padding-left: 0;
+  list-style: none;
+  counter-reset: sdd-step;
+}
+.sdd-nextsteps__body ol > li {
+  counter-increment: sdd-step;
+  position: relative;
+  padding: 6px 0 6px 34px;
+  line-height: 1.45;
+}
+.sdd-nextsteps__body ol > li + li {
+  border-top: 1px solid var(--background-modifier-border);
+}
+.sdd-nextsteps__body ol > li::before {
+  content: counter(sdd-step);
+  position: absolute;
+  left: 0;
+  top: 6px;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--interactive-accent);
+  color: var(--text-on-accent);
+  font-size: 0.78rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.sdd-nextsteps__body ul {
+  margin: 6px 0 2px;
+}
+
+.sdd-chip--copy {
+  cursor: pointer;
+}
+.sdd-chip--copy:hover {
+  background: var(--background-modifier-hover);
+}
+.sdd-chip--copy:active {
+  transform: scale(0.96);
+}
+.sdd-review__summary {
+  margin-top: 8px;
+  font-size: 0.88rem;
+  line-height: 1.45;
+}
+/* Origin context: whose card is this, said first. */
+.sdd-review__origin {
+  margin-top: 10px;
+  padding: 8px 10px;
+  border-radius: 8px;
+  background: var(--background-secondary);
+  border: 1px solid var(--background-modifier-border);
+}
+.sdd-review__origin-head {
+  font-size: 0.75rem;
+  font-weight: 650;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+.sdd-review__origin-body {
+  margin-top: 4px;
+  font-size: 0.88rem;
+  line-height: 1.45;
+}
+.sdd-review__spec { margin-top: 10px; }
+.sdd-review__spec > summary {
+  cursor: pointer;
+  font-size: 0.78rem;
+  font-weight: 650;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.sdd-review__specbody {
+  margin-top: 6px;
+  font-size: 0.83rem;
+  line-height: 1.45;
+  white-space: pre-wrap;
+  color: var(--text-muted);
+}
+.sdd-review__label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+  margin-bottom: 5px;
+}
+.sdd-review__screens { margin-top: 14px; }
+.sdd-review__shots { margin-top: 14px; }
+.sdd-review__shotstrip { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 6px; }
+.sdd-review__shot {
+  max-height: 140px;
+  max-width: 45%;
+  border-radius: 6px;
+  border: 1px solid var(--background-modifier-border);
+  cursor: zoom-in;
+}
+.sdd-review__screenrow {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.sdd-review__screen {
+  font-size: 0.78rem;
+  border-radius: 999px;
+  padding: 2px 10px;
+}
+.sdd-review__feedback { margin-top: 14px; }
+.sdd-review__fbbody {
+  width: 100%;
+  resize: vertical;
+  font-size: 0.85rem;
+}
+.sdd-review__fbsend {
+  margin-top: 6px;
+  font-size: 0.8rem;
+}
+.sdd-review__images {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 10px;
+}
+.sdd-review__image {
+  max-width: 180px;
+  max-height: 140px;
+  border-radius: 6px;
+  cursor: pointer;
+  object-fit: cover;
+}
+.sdd-review__note {
+  font-size: 0.88rem;
+  max-height: 62vh;
+  overflow-y: auto;
+}
+.sdd-review__note img { max-width: 100%; }
+.sdd-review__opennote {
+  margin-top: 10px;
+  font-size: 0.78rem;
+}
+.sdd-review__noteempty {
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: flex-start;
+}
+.sdd-review__routes {
+  position: sticky;
+  bottom: 0;
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 14px;
+  padding: 10px 0 4px;
+  background: var(--background-primary);
+  border-top: 1px solid var(--background-modifier-border);
+}
+.sdd-review__rework { color: var(--text-warning); }
+.sdd-review__reject { color: var(--text-error); }
+.sdd-review__done {
+  margin-top: 40px;
+  text-align: center;
+}
+.sdd-review__done-title {
+  font-size: 1.2rem;
+  font-weight: 700;
+}
+.sdd-review__done-sub {
+  margin-top: 6px;
+  color: var(--text-muted);
+}
+
+/* Board search as an in-row icon */
+.sdd-searchwrap { display: flex; align-items: center; gap: 4px; }
+.sdd-searchwrap__btn {
+  display: flex; align-items: center; justify-content: center;
+  padding: 4px 8px;
+}
+.sdd-searchwrap__input {
+  display: none;
+  width: 0;
+  padding: 4px 10px;
+  border-radius: 8px;
+  border: 1px solid var(--background-modifier-border);
+  background: var(--background-primary);
+}
+.sdd-searchwrap.is-open .sdd-searchwrap__input {
+  display: block;
+  width: min(240px, 40vw);
+}
+.sdd-card--hidden { display: none; }
+
+/* ---- Big Board: lanes × status columns ---- */
+.sdd-big {
+  display: grid;
+  grid-template-columns: 130px repeat(var(--sdd-big-cols, 5), minmax(150px, 1fr));
+  gap: 6px;
+  overflow-x: auto;
+  padding-bottom: 8px;
+}
+.sdd-big__corner { min-height: 1px; }
+.sdd-big__colhead {
+  padding: 6px 8px;
+  border-bottom: 2px solid var(--background-modifier-border);
+}
+.sdd-big__collabel {
+  font-weight: 700;
+  font-size: 0.86em;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+.sdd-big__colblurb {
+  color: var(--text-faint);
+  font-size: 0.76em;
+  line-height: 1.3;
+}
+.sdd-big__lanehead {
+  display: flex;
+  align-items: flex-start;
+  padding: 8px 6px;
+  border-right: 2px solid var(--background-modifier-border);
+}
+.sdd-big__lanelabel {
+  font-weight: 650;
+  font-size: 0.84em;
+  color: var(--text-muted);
+}
+.sdd-big__cell {
+  min-height: 64px;
+  padding: 4px;
+  border: 1px dashed color-mix(in srgb, var(--background-modifier-border) 70%, transparent);
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.sdd-big__cell--over {
+  border-color: var(--interactive-accent);
+  background: color-mix(in srgb, var(--interactive-accent) 8%, transparent);
+}
+.sdd-big__empty {
+  color: var(--text-faint);
+  text-align: center;
+  margin: auto;
+}
+.sdd-big__initiative {
+  background: var(--background-secondary);
+  border: 1px solid var(--background-modifier-border);
+  border-radius: 8px;
+  padding: 8px 9px;
+}
+.sdd-big__initiativetitle {
+  font-weight: 650;
+  cursor: pointer;
+  line-height: 1.25;
+}
+.sdd-big__initiativewhy {
+  color: var(--text-muted);
+  font-size: 0.82em;
+  line-height: 1.35;
+  margin-top: 2px;
+}
+.sdd-big__ddchip {
+  display: inline-block;
+  margin-top: 5px;
+  padding: 1px 7px;
+  border-radius: 9px;
+  font-size: 0.74em;
+  background: color-mix(in srgb, var(--interactive-accent) 14%, var(--background-primary));
+  color: var(--text-normal);
+}
+.sdd-big__bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.sdd-big__hint {
+  color: var(--text-muted);
+  font-size: 0.84em;
+}
+.sdd-big__recs {
+  margin-top: 18px;
+  border-top: 1px solid var(--background-modifier-border);
+  padding-top: 8px;
+}
+.sdd-big__rec {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 6px 4px;
+  border-bottom: 1px solid color-mix(in srgb, var(--background-modifier-border) 60%, transparent);
+}
+.sdd-big__recmain { min-width: 0; }
+.sdd-big__recplace {
+  display: inline-block;
+  margin-right: 8px;
+  padding: 1px 7px;
+  border-radius: 9px;
+  font-size: 0.74em;
+  background: var(--background-secondary);
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+.sdd-big__rectitle { font-weight: 600; }
+.sdd-big__recwhy { color: var(--text-muted); font-size: 0.86em; }
+.sdd-big__recactions { display: flex; gap: 6px; flex-shrink: 0; }
+@media (max-width: 600px) {
+  .sdd-big { grid-template-columns: 96px repeat(var(--sdd-big-cols, 5), minmax(140px, 1fr)); }
+  .sdd-big__rec { flex-direction: column; align-items: flex-start; }
+}
+
+/* Review Undo: reachable up top, visually a caution. */
+.sdd-review__undo {
+  color: var(--dvb-warn, #b7791f);
+  border-color: color-mix(in srgb, var(--dvb-warn, #b7791f) 40%, transparent);
+}
