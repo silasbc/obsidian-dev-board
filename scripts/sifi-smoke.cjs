@@ -261,7 +261,51 @@ const EVENT = {
     assert.equal(plugin.bootstrapWarning, null);
   }
 
-  console.log("Sifi smoke passed: bootstrap guard (clean, events-only, cards-only, existing), big board guard, collapsed-column default.");
+  // E. Auto-advance to Lived: stale Testing/Shipped/Reviewed cards move, fresh ones stay, backlog never, off at 0.
+  const stamp = (daysAgo) => { const d = new Date(Date.now() - daysAgo * 86400000); const pad = (n) => String(n).padStart(2, "0"); return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`; };
+  const mkEvent = (files, id, column, daysAgo, n) => {
+    const ts = stamp(daysAgo);
+    const eventId = `${ts.replace(/[:+\-.]/g, "")}-lead-session-${String(n).padStart(6, "0")}-deadbeef`;
+    files.set(`Dev Board/Events/lead-session/${eventId}.json`, JSON.stringify({ ...EVENT, event_id: eventId, ts, card_id: id, card: { ...EVENT.card, id, title: id, column, created: ts, updated: ts, history: [{ ts, action: `created in ${column}`, by: "lead-session" }] } }));
+  };
+  {
+    const { app, files } = makeApp();
+    mkEvent(files, "dd-20260828-stal", "testing", 8, 1);
+    mkEvent(files, "dd-20260904-fres", "testing", 1, 2);
+    mkEvent(files, "dd-20260801-idea", "ideas", 30, 3);
+    mkEvent(files, "dd-20260801-ship", "shipped", 20, 4);
+    const plugin = await makePlugin(app);
+    assert.equal(plugin.settings.autoLiveDays, 7, "auto-live defaults to 7 days");
+    await plugin.loadBoard();
+    assert.equal(plugin.findCard("dd-20260828-stal").column, "lived", "8-day-old testing card advanced to lived");
+    assert.match(plugin.findCard("dd-20260828-stal").history.slice(-1)[0].action, /auto-advanced testing → lived: 7 days/, "history says why");
+    assert.equal(plugin.findCard("dd-20260828-stal").history.slice(-1)[0].by, "dev-board-auto");
+    assert.equal(plugin.findCard("dd-20260801-ship").column, "lived", "20-day-old shipped card advanced to lived");
+    assert.equal(plugin.findCard("dd-20260904-fres").column, "testing", "fresh card stays");
+    assert.equal(plugin.findCard("dd-20260801-idea").column, "ideas", "backlog columns never auto-advance");
+    assert.ok([...files.keys()].some((f) => f.includes("/Events/") && String(files.get(f)).includes("auto-advanced")), "the move is an event like any other");
+    await plugin.loadBoard();
+    assert.equal(plugin.findCard("dd-20260828-stal").history.filter((h) => /auto-advanced/.test(h.action)).length, 1, "a second load does not sweep twice");
+  }
+  {
+    const { app } = makeApp();
+    const plugin = await makePlugin(app);
+    plugin.settings.autoLiveDays = 0;
+    const { files } = { files: null };
+    void files;
+    const stale = await plugin.addCard({ title: "Old with auto off", column: "shipped", source: "agent" });
+    void stale;
+  }
+  {
+    const { app, files } = makeApp();
+    mkEvent(files, "dd-20260801-offx", "shipped", 30, 1);
+    const plugin = await makePlugin(app);
+    plugin.settings.autoLiveDays = 0;
+    await plugin.loadBoard();
+    assert.equal(plugin.findCard("dd-20260801-offx").column, "shipped", "0 days turns the sweep off");
+  }
+
+  console.log("Sifi smoke passed: bootstrap guard (clean, events-only, cards-only, existing), big board guard, collapsed-column default, auto-live sweep.");
 })().catch((error) => {
   console.error(error);
   process.exit(1);

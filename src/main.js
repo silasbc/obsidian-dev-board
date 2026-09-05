@@ -42,6 +42,7 @@ const DEFAULT_SETTINGS = {
   debriefsPath: "Dev Board/Debriefs",
   bigBoardPath: "Dev Board/big_board.json",
   collapseEmptyColumns: true, // [sifi] dd-20260821-2fqz: empty columns collapse to slim stubs on desktop
+  autoLiveDays: 7, // [sifi] owner rule 2026-09-05: a card with no Doesn't for N days advances to Lived; 0 = off
   projectRoot: "",
   ownerLabel: "Me",
   agentLabel: "Agent",
@@ -554,6 +555,7 @@ export default class DevBoardPlugin extends ShellPlugin {
           .map((card) => [card.id, JSON.stringify(card)])
       );
       this.lastError = null;
+      await this.autoLiveSweep(); // [sifi]
     } catch (e) {
       this.board = null;
       this.lastError = `Cannot read ${this.settings.boardPath}: ${e.message || e}`;
@@ -879,6 +881,49 @@ export default class DevBoardPlugin extends ShellPlugin {
       }
     }
     return card;
+  }
+
+  // [sifi] Owner rule 2026-09-05 ("default to lived, review the exceptions"): a
+  // card in Testing, Shipped, or Reviewed whose last history entry is older than
+  // autoLiveDays advances to Lived on its own. Any feedback, verdict, or edit
+  // appends history and so resets the clock. Emits the same events a move does.
+  autoLiveCandidates(now = Date.now()) {
+    const days = Number(this.settings.autoLiveDays);
+    if (!(days > 0) || !this.board) return [];
+    const cutoff = now - days * 86400000;
+    const out = [];
+    for (const card of this.board.cards || []) {
+      if (!["testing", "shipped", "reviewed"].includes(card.column)) continue;
+      const last = (card.history || []).slice(-1)[0];
+      const stamp = Date.parse((last && last.ts) || card.updated || "");
+      if (!Number.isFinite(stamp) || stamp > cutoff) continue;
+      out.push(card);
+    }
+    return out;
+  }
+
+  async autoLiveSweep() {
+    if (this._autoLiving) return 0;
+    const due = this.autoLiveCandidates();
+    if (!due.length) return 0;
+    this._autoLiving = true;
+    try {
+      const days = Number(this.settings.autoLiveDays);
+      for (const card of due) {
+        const from = card.column;
+        card.column = "lived";
+        card.updated = localIso();
+        (card.history = card.history || []).push({
+          ts: card.updated,
+          action: `auto-advanced ${from} → lived: ${days} days with no Doesn't (owner rule 2026-09-05, default to Lived)`,
+          by: "dev-board-auto",
+        });
+      }
+      await this.saveBoard();
+      return due.length;
+    } finally {
+      this._autoLiving = false;
+    }
   }
 
   async moveCard(id, toColumn, by = "owner") {
@@ -2765,6 +2810,16 @@ class DevBoardSettingTab extends PluginSettingTab {
     bind("Subsystems", "Comma-separated subsystem labels always offered in pickers (card values are added automatically).", "subsystems", { allowEmpty: true });
     // [sifi] Sifi's edition
     containerEl.createEl("h3", { text: "Sifi's edition" });
+    new Setting(containerEl)
+      .setName("Auto-advance to Lived after N days")
+      .setDesc("A card in Testing, Shipped, or Reviewed with no feedback, verdict, or edit for this many days moves to Lived on its own. 0 turns it off.")
+      .addText((t) =>
+        t.setValue(String(this.plugin.settings.autoLiveDays)).onChange(async (v) => {
+          const n = parseInt(v, 10);
+          this.plugin.settings.autoLiveDays = Number.isFinite(n) && n >= 0 ? n : DEFAULT_SETTINGS.autoLiveDays;
+          await this.plugin.saveSettings();
+        })
+      );
     new Setting(containerEl)
       .setName("Collapse empty columns")
       .setDesc("On desktop, an empty column shrinks to a slim stub; drag over it or click it to open it.")
