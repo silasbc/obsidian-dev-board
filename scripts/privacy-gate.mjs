@@ -45,7 +45,8 @@ const checks = [
 ];
 
 const EMAIL_RE = /\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b/gi;
-const GITHUB_NOREPLY_RE = /^[A-Z0-9._%+-]+@users\.noreply\.github\.com$/i;
+// Sifi's edition: the AI co-author trailer uses a public, non-personal noreply address.
+const GITHUB_NOREPLY_RE = /^(?:[A-Z0-9._%+-]+@users\.noreply\.github\.com|noreply@anthropic\.com)$/i;
 
 function git(repo, args, options = {}) {
   return execFileSync("git", args, {

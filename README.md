@@ -81,3 +81,7 @@ Public releases use a three-door privacy gate: the tracked pre-push hook, `npm r
 ## License
 
 MIT — see [LICENSE](LICENSE).
+
+## Sifi's edition
+
+This repository is a fork. It keeps the record contract and plugin id exactly as upstream defines them and adds a bootstrap guard for unsynced devices, collapsed empty columns on the desktop, and a viewport-fit review room. See [FORK.md](FORK.md).

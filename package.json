@@ -1,10 +1,10 @@
 {
   "name": "dev-board",
-  "version": "1.0.0",
+  "version": "1.0.0-sifi.1",
   "description": "Dev Board plugin for Obsidian — an agent-friendly kanban dev-cycle board over plain JSON records.",
   "scripts": {
     "build": "esbuild src/main.js --bundle --format=cjs --platform=node --target=es2020 --external:obsidian --external:electron --outfile=main.js",
-    "check": "node --check src/main.js && node --check src/shell.js && node scripts/smoke-test.cjs && node scripts/release-check.mjs",
+    "check": "node --check src/main.js && node --check src/shell.js && node scripts/smoke-test.cjs && node scripts/sifi-smoke.cjs && node scripts/release-check.mjs",
     "privacy:check": "node scripts/privacy-gate.mjs",
     "privacy:self-test": "node scripts/privacy-gate.mjs --self-test",
     "privacy:install-hook": "git config core.hooksPath .githooks && node scripts/privacy-gate.mjs",

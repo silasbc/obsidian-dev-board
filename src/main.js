@@ -41,6 +41,7 @@ const DEFAULT_SETTINGS = {
   notesPath: "Dev Board/Meeting Notes.md",
   debriefsPath: "Dev Board/Debriefs",
   bigBoardPath: "Dev Board/big_board.json",
+  collapseEmptyColumns: true, // [sifi] dd-20260821-2fqz: empty columns collapse to slim stubs on desktop
   projectRoot: "",
   ownerLabel: "Me",
   agentLabel: "Agent",
@@ -334,6 +335,11 @@ export default class DevBoardPlugin extends ShellPlugin {
   async loadBigBoard() {
     try {
       if (!(await this.app.vault.adapter.exists(this.settings.bigBoardPath))) {
+        // [sifi] dd-20260831-btsp: big_board.json is not event-sourced, so a blank
+        // scaffold written here would overwrite the real one when sync catches up.
+        if (this.syncPending) {
+          throw new Error("big_board.json has not synced to this device yet — waiting rather than writing a blank one over it");
+        }
         await this.ensureRecordDir(this.settings.bigBoardPath.split("/").slice(0, -1).join("/"));
         await this.atomicWrite(this.settings.bigBoardPath, JSON.stringify(STARTER_BIG_BOARD, null, 2) + "\n");
       }
@@ -490,12 +496,55 @@ export default class DevBoardPlugin extends ShellPlugin {
     return { inFlight, shipped, linked: linked.size };
   }
 
+  // [sifi] What the Dev Board folder already holds, for the bootstrap guard below.
+  async boardHistory() {
+    const adapter = this.app.vault.adapter;
+    const root = this.boardDir();
+    const count = async (dir, re) => {
+      try {
+        const listing = await adapter.list(dir);
+        let n = (listing.files || []).filter((f) => re.test(f)).length;
+        for (const sub of listing.folders || []) {
+          try {
+            const inner = await adapter.list(sub);
+            n += (inner.files || []).filter((f) => re.test(f)).length;
+          } catch (e) { /* unreadable subfolder */ }
+        }
+        return n;
+      } catch (e) {
+        return 0;
+      }
+    };
+    return {
+      events: await count(`${root}/Events`, /\.json$/),
+      records: await count(`${root}/Records`, /\.json$/),
+      cards: await count(`${root}/Cards`, /\.md$/),
+    };
+  }
+
   async loadBoard() {
     try {
-      // First run: write a starter board so the plugin opens working.
+      // First run: write a starter board so the plugin opens working — but only
+      // on a truly empty board. [sifi] dd-20260831-btsp: a device whose
+      // board.json has not synced yet (Obsidian Sync skips .json by default)
+      // still holds Events/, Records/, or card notes; scaffolding a blank
+      // starter there blanked the board on two devices on 2026-08-31. With
+      // history present, only a columns shell is written and the reducer
+      // rebuilds every card from the event log; with card notes but no
+      // history, the board says so instead of pretending to be empty.
+      this.bootstrapWarning = null;
+      this.syncPending = false;
       if (!(await this.app.vault.adapter.exists(this.settings.boardPath))) {
+        const history = await this.boardHistory();
         await this.ensureRecordDir(this.boardDir());
         await this.atomicWrite(this.settings.boardPath, JSON.stringify(STARTER_BOARD, null, 2) + "\n");
+        if (history.events || history.records) {
+          this.syncPending = true;
+          this.bootstrapWarning = `board.json was missing on this device; rebuilt from ${history.events} event file(s) and ${history.records} record(s).`;
+        } else if (history.cards) {
+          this.syncPending = true;
+          this.bootstrapWarning = `${history.cards} card note(s) are here but no board events or records have synced yet, so this board shows empty until they arrive. Enable "Sync all other types" for this vault on the device that holds the board, then on this one.`;
+        }
       }
       await this.reduceBoardEvents();
       const raw = await this.app.vault.adapter.read(this.settings.boardPath);
@@ -1146,6 +1195,7 @@ class DevBoardView extends ShellItemView {
       return;
     }
 
+    if (p.bootstrapWarning) c.createDiv({ cls: "sdd-bootstrap", text: `Dev Board: ${p.bootstrapWarning}` }); // [sifi]
     this.renderBoard(c);
     this.renderDebriefs(c);
     this.renderMeetingNotes(c);
@@ -1312,6 +1362,13 @@ class DevBoardView extends ShellItemView {
     for (const col of p.columns()) {
       const colEl = board.createDiv({ cls: ["sdd-col", `sdd-col--${col.id}`] });
       const inCol = cards.filter((c) => c.column === col.id);
+      // [sifi] dd-20260821-2fqz: on desktop an empty column collapses to a slim stub so
+      // active lanes get the width. It stays a live drop target (dragover expands it
+      // through CSS) and a click opens it in place.
+      if (inCol.length === 0 && p.settings.collapseEmptyColumns !== false && !(this.app && this.app.isMobile)) {
+        colEl.classList.add("sdd-col--collapsed");
+        colEl.addEventListener("click", () => colEl.classList.toggle("sdd-col--collapsed"));
+      }
 
       const head = colEl.createDiv({ cls: "sdd-col__head" });
       head.createSpan({ cls: "sdd-col__label", text: col.label });
@@ -1731,6 +1788,7 @@ class ReviewView extends ShellItemView {
   }
 
   async render() {
+    if (this.containerEl && this.containerEl.classList) this.containerEl.classList.add("sdd-review-fit"); // [sifi] dd-20260821-d1vo
     await this.refresh(true);
   }
 
@@ -2705,6 +2763,17 @@ class DevBoardSettingTab extends PluginSettingTab {
     bind("Your name", "Label shown on cards you create.", "ownerLabel");
     bind("Agent name", "Label shown on cards created by an external writer (source: \"agent\").", "agentLabel");
     bind("Subsystems", "Comma-separated subsystem labels always offered in pickers (card values are added automatically).", "subsystems", { allowEmpty: true });
+    // [sifi] Sifi's edition
+    containerEl.createEl("h3", { text: "Sifi's edition" });
+    new Setting(containerEl)
+      .setName("Collapse empty columns")
+      .setDesc("On desktop, an empty column shrinks to a slim stub; drag over it or click it to open it.")
+      .addToggle((t) =>
+        t.setValue(this.plugin.settings.collapseEmptyColumns !== false).onChange(async (v) => {
+          this.plugin.settings.collapseEmptyColumns = v;
+          await this.plugin.saveSettings();
+        })
+      );
   }
 }
 

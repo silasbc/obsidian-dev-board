@@ -1046,3 +1046,31 @@ body {
   color: var(--dvb-warn, #b7791f);
   border-color: color-mix(in srgb, var(--dvb-warn, #b7791f) 40%, transparent);
 }
+
+/* ---- Sifi's edition (FORK.md) ---- */
+/* dd-20260831-btsp: bootstrap notice */
+.sdd-bootstrap { margin: 0 0 10px; padding: 8px 12px; border: 1px solid var(--text-warning); border-radius: 8px; font-size: 0.82rem; color: var(--text-warning); }
+
+/* dd-20260821-2fqz: empty columns collapse to slim stubs on desktop; dragover or click opens them */
+.sdd-col--collapsed { flex: 0 0 56px; min-width: 56px; max-width: 56px; cursor: pointer; }
+.sdd-col--collapsed .sdd-col__head { flex-direction: column; align-items: center; gap: 8px; padding: 12px 4px; }
+.sdd-col--collapsed .sdd-col__label { writing-mode: vertical-rl; transform: rotate(180deg); font-size: 0.72rem; letter-spacing: 0.04em; white-space: nowrap; }
+.sdd-col--collapsed .sdd-col__body { min-height: 140px; padding: 4px; }
+.sdd-col--collapsed .sdd-col__empty { display: none; }
+.sdd-col--collapsed.sdd-col--over { flex: 1 0 218px; min-width: 218px; max-width: 340px; }
+
+/* dd-20260821-d1vo: viewport-fit review room — panes scroll inside, the verdict bar stays on screen */
+.sdd-review-fit .view-content { display: flex; flex-direction: column; overflow: hidden; }
+.sdd-review-fit .dvb-surface { display: flex; flex-direction: column; flex: 1 1 auto; min-height: 0; }
+.sdd-review-fit .dvb-surface > * { flex: 0 0 auto; }
+.sdd-review-fit .dvb-surface__content { display: flex; flex-direction: column; flex: 1 1 auto; min-height: 0; }
+.sdd-review-fit .sdd-review__grid { flex: 1 1 auto; min-height: 0; align-items: stretch; }
+.sdd-review-fit .sdd-review__cardpane,
+.sdd-review-fit .sdd-review__notepane { overflow-y: auto; min-height: 0; }
+.sdd-review-fit .sdd-review__note { max-height: none; overflow: visible; }
+.sdd-review-fit .sdd-review__routes { position: static; flex: 0 0 auto; }
+@media (max-width: 760px) {
+  .sdd-review-fit .view-content { display: block; overflow: auto; }
+  .sdd-review-fit .sdd-review__grid { display: grid; }
+  .sdd-review-fit .sdd-review__routes { position: sticky; }
+}
