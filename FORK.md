@@ -13,7 +13,7 @@ This is Silas's fork of [cobbenterprises/obsidian-dev-board](https://github.com/
 ## What Sifi's edition adds
 
 1. **Bootstrap guard** (dd-20260831-btsp). A device whose `board.json` has not synced yet (Obsidian Sync skips `.json` unless "Sync all other types" is on) no longer gets a blank starter board written over a real one. With events or records present the reducer rebuilds every card; with only card notes present the board says on screen what it is waiting for and names the fix. `big_board.json`, which is not event-sourced, is left absent in that state rather than scaffolded blank (last writer wins on sync). A clean first run still gets the starter board.
-2. **Collapsed empty columns** (dd-20260821-2fqz). On desktop an empty column shrinks to a slim vertical-label stub so active lanes get the width. It stays a live drop target: dragging over it expands it, a click opens it in place. Setting: "Collapse empty columns", default on. Mobile keeps full columns.
+2. **Collapsed empty columns** (dd-20260821-2fqz). On desktop an empty column narrows to a 124px stub with its normal header (no sideways text) so active lanes get the width. It stays a live drop target: dragging over it expands it, a click opens it in place. Setting: "Collapse empty columns", default on. Mobile keeps full columns.
 3. **Viewport-fit review room** (dd-20260821-d1vo). The review room fills the window height, the card and note panes scroll inside, and the verdict bar is always on screen. Below 760px it falls back to the page-scroll layout with the sticky bar.
 
 ## Build
@@ -21,6 +21,10 @@ This is Silas's fork of [cobbenterprises/obsidian-dev-board](https://github.com/
 `npm install`, `npm run build`, `npm run check` (upstream's smoke test, this fork's `scripts/sifi-smoke.cjs`, and the release check). Node 22 works; upstream uses bun, so `package-lock.json` stays out of the repo. This clone has `core.autocrlf=false`.
 
 ## Changelog (Sifi's edition)
+
+### 1.0.0-sifi.2 — 2026-09-05
+
+- Collapsed columns keep a horizontal header at 124px instead of a 56px sideways label (owner feedback on the Prototype stub).
 
 ### 1.0.0-sifi.1 — 2026-09-05
 

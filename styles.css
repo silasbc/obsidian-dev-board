@@ -1051,13 +1051,15 @@ body {
 /* dd-20260831-btsp: bootstrap notice */
 .sdd-bootstrap { margin: 0 0 10px; padding: 8px 12px; border: 1px solid var(--text-warning); border-radius: 8px; font-size: 0.82rem; color: var(--text-warning); }
 
-/* dd-20260821-2fqz: empty columns collapse to slim stubs on desktop; dragover or click opens them */
-.sdd-col--collapsed { flex: 0 0 56px; min-width: 56px; max-width: 56px; cursor: pointer; }
-.sdd-col--collapsed .sdd-col__head { flex-direction: column; align-items: center; gap: 8px; padding: 12px 4px; }
-.sdd-col--collapsed .sdd-col__label { writing-mode: vertical-rl; transform: rotate(180deg); font-size: 0.72rem; letter-spacing: 0.04em; white-space: nowrap; }
-.sdd-col--collapsed .sdd-col__body { min-height: 140px; padding: 4px; }
-.sdd-col--collapsed .sdd-col__empty { display: none; }
-.sdd-col--collapsed.sdd-col--over { flex: 1 0 218px; min-width: 218px; max-width: 340px; }
+/* dd-20260821-2fqz: empty columns narrow to a 124px stub on desktop — same header, read the
+   normal way (the owner's word on the sideways label: "gross"); dragover or a click opens them */
+.sdd-col--collapsed { flex: 0 0 124px; min-width: 124px; max-width: 124px; cursor: pointer; opacity: 0.85; }
+.sdd-col--collapsed .sdd-col__head { gap: 6px; padding: 8px 8px; }
+.sdd-col--collapsed .sdd-col__label { font-size: 0.68rem; letter-spacing: 0.06em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+.sdd-col--collapsed .sdd-col__body { min-height: 84px; padding: 6px; }
+.sdd-col--collapsed .sdd-col__empty { padding: 10px 0; font-size: 0.78rem; }
+.sdd-col--collapsed:hover { opacity: 1; }
+.sdd-col--collapsed.sdd-col--over { flex: 1 0 218px; min-width: 218px; max-width: 340px; opacity: 1; }
 
 /* dd-20260821-d1vo: viewport-fit review room — panes scroll inside, the verdict bar stays on screen */
 .sdd-review-fit .view-content { display: flex; flex-direction: column; overflow: hidden; }
