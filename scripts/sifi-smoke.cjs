@@ -305,7 +305,16 @@ const EVENT = {
     assert.equal(plugin.findCard("dd-20260801-offx").column, "shipped", "0 days turns the sweep off");
   }
 
-  console.log("Sifi smoke passed: bootstrap guard (clean, events-only, cards-only, existing), big board guard, collapsed-column default, auto-live sweep.");
+  // F. Review queue keys follow the board's real columns, Shipped first.
+  {
+    const { app, files } = makeApp();
+    files.set("Dev Board/board.json", JSON.stringify({ version: 1, columns: [{ id: "ideas", label: "Ideas" }, { id: "next", label: "Prototype" }, { id: "testing", label: "Testing" }, { id: "shipped", label: "Shipped" }, { id: "recshare", label: "Recommendations" }], cards: [], archive: [] }));
+    const plugin = await makePlugin(app);
+    await plugin.loadBoard();
+    assert.deepEqual(Array.from(plugin.reviewQueueKeys()), ["shipped", "ideas", "next", "testing", "recshare"], "Shipped first, then the vault's own columns in board order"); // Array.from: the vm realm's arrays fail strict deep-equal
+  }
+
+  console.log("Sifi smoke passed: bootstrap guard (clean, events-only, cards-only, existing), big board guard, collapsed-column default, auto-live sweep, review queue keys.");
 })().catch((error) => {
   console.error(error);
   process.exit(1);

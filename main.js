@@ -957,6 +957,13 @@ var DevBoardPlugin = class extends ShellPlugin {
   columns() {
     return this.board?.columns || [];
   }
+  // [sifi] The review room's queue keys: Shipped first (sign-off is the default
+  // mode), then every other column in board order. Derived from the board, so a
+  // vault's own columns are always reviewable.
+  reviewQueueKeys() {
+    const ids = this.columns().map((c) => c.id);
+    return ["shipped", ...ids.filter((k) => k !== "shipped")].filter((k, i, a) => ids.includes(k) && a.indexOf(k) === i);
+  }
   columnLabel(id) {
     return this.columns().find((c) => c.id === id)?.label || id;
   }
@@ -1920,7 +1927,7 @@ var ReviewView = class extends ShellItemView {
   queueOptions() {
     const cards = this.plugin.board?.cards || [];
     const count = (col) => cards.filter((c) => c.column === col).length;
-    return ["shipped", "recommended", "ideas", "next", "finalize", "building", "notsold", "reviewed", "lived"].map((key) => [key, `${this.plugin.columnLabel(key)} (${count(key)})`]);
+    return this.plugin.reviewQueueKeys().map((key) => [key, `${this.plugin.columnLabel(key)} (${count(key)})`]);
   }
   saveDraft() {
     if (this._fbIn && this._fbCardId) {
@@ -2290,6 +2297,13 @@ ${embeds}` : embeds,
     if (col === "finalize") {
       routeBtn(`\u2713 Build it \u2192 ${p.columnLabel("building")}`, "building", { cta: true });
       routeBtn(`Back to ${p.columnLabel("next")}`, "next");
+      routeBtn("Not sold", "notsold");
+      routeBtn("Reject", "rejected", { cls: "sdd-review__reject" });
+      return;
+    }
+    if (col === "testing") {
+      routeBtn(`\u2713 Works \u2192 ${p.columnLabel("lived")}`, "lived", { cta: true });
+      routeBtn(`Doesn't \u2192 ${p.columnLabel("building")}`, "building", { cls: "sdd-review__rework" });
       routeBtn("Not sold", "notsold");
       routeBtn("Reject", "rejected", { cls: "sdd-review__reject" });
       return;

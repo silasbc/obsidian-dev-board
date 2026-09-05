@@ -1,6 +1,6 @@
 {
   "name": "dev-board",
-  "version": "1.0.0-sifi.3",
+  "version": "1.0.0-sifi.4",
   "description": "Dev Board plugin for Obsidian — an agent-friendly kanban dev-cycle board over plain JSON records.",
   "scripts": {
     "build": "esbuild src/main.js --bundle --format=cjs --platform=node --target=es2020 --external:obsidian --external:electron --outfile=main.js",

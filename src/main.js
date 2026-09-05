@@ -827,6 +827,14 @@ export default class DevBoardPlugin extends ShellPlugin {
     return this.board?.columns || [];
   }
 
+  // [sifi] The review room's queue keys: Shipped first (sign-off is the default
+  // mode), then every other column in board order. Derived from the board, so a
+  // vault's own columns are always reviewable.
+  reviewQueueKeys() {
+    const ids = this.columns().map((c) => c.id);
+    return ["shipped", ...ids.filter((k) => k !== "shipped")].filter((k, i, a) => ids.includes(k) && a.indexOf(k) === i);
+  }
+
   columnLabel(id) {
     return this.columns().find((c) => c.id === id)?.label || id;
   }
@@ -1865,8 +1873,9 @@ class ReviewView extends ShellItemView {
   queueOptions() {
     const cards = this.plugin.board?.cards || [];
     const count = (col) => cards.filter((c) => c.column === col).length;
-    return ["shipped", "recommended", "ideas", "next", "finalize", "building", "notsold", "reviewed", "lived"]
-      .map((key) => [key, `${this.plugin.columnLabel(key)} (${count(key)})`]);
+    // [sifi] every column the board actually has, Shipped first — a vault's own
+    // columns (Testing, Recommendations, …) were unreachable from the room before.
+    return this.plugin.reviewQueueKeys().map((key) => [key, `${this.plugin.columnLabel(key)} (${count(key)})`]);
   }
 
   saveDraft() {
@@ -2280,6 +2289,15 @@ class ReviewView extends ShellItemView {
     if (col === "finalize") {
       routeBtn(`✓ Build it → ${p.columnLabel("building")}`, "building", { cta: true });
       routeBtn(`Back to ${p.columnLabel("next")}`, "next");
+      routeBtn("Not sold", "notsold");
+      routeBtn("Reject", "rejected", { cls: "sdd-review__reject" });
+      return;
+    }
+    if (col === "testing") {
+      // [sifi] Owner rule 2026-09-05: Testing is the owner's look. Works sends it
+      // to Lived; a Doesn't (feedback rides along) sends it back to Build.
+      routeBtn(`✓ Works → ${p.columnLabel("lived")}`, "lived", { cta: true });
+      routeBtn(`Doesn't → ${p.columnLabel("building")}`, "building", { cls: "sdd-review__rework" });
       routeBtn("Not sold", "notsold");
       routeBtn("Reject", "rejected", { cls: "sdd-review__reject" });
       return;

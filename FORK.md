@@ -12,6 +12,7 @@ This is Silas's fork of [cobbenterprises/obsidian-dev-board](https://github.com/
 
 ## What Sifi's edition adds
 
+0. **The review room reaches every column** (owner complaint 2026-09-05: the review room could not show the Testing column at all — its queue picker was a fixed list of upstream's columns). Queue keys now come from the board's real columns, Shipped first; a Testing card gets Works → Lived and Doesn't → Build (typed feedback rides along), Not sold, Reject.
 1. **Auto-advance to Lived** (owner rule 2026-09-05, "default to lived, review the exceptions"). A card in Testing, Shipped, or Reviewed whose last history entry is older than N days (setting, default 7; 0 off) moves to Lived on its own, as an ordinary event by `dev-board-auto`. Feedback, verdicts, and edits append history and so reset the clock.
 2. **Bootstrap guard** (dd-20260831-btsp). A device whose `board.json` has not synced yet (Obsidian Sync skips `.json` unless "Sync all other types" is on) no longer gets a blank starter board written over a real one. With events or records present the reducer rebuilds every card; with only card notes present the board says on screen what it is waiting for and names the fix. `big_board.json`, which is not event-sourced, is left absent in that state rather than scaffolded blank (last writer wins on sync). A clean first run still gets the starter board.
 3. **Collapsed empty columns** (dd-20260821-2fqz). On desktop an empty column narrows to a 124px stub with its normal header (no sideways text) so active lanes get the width. It stays a live drop target: dragging over it expands it, a click opens it in place. Setting: "Collapse empty columns", default on. Mobile keeps full columns.
@@ -22,6 +23,10 @@ This is Silas's fork of [cobbenterprises/obsidian-dev-board](https://github.com/
 `npm install`, `npm run build`, `npm run check` (upstream's smoke test, this fork's `scripts/sifi-smoke.cjs`, and the release check). Node 22 works; upstream uses bun, so `package-lock.json` stays out of the repo. This clone has `core.autocrlf=false`.
 
 ## Changelog (Sifi's edition)
+
+### 1.0.0-sifi.4 — 2026-09-05
+
+- Review room queue picker follows the board's own columns (Testing was unreachable); Testing verdicts: Works → Lived, Doesn't → Build.
 
 ### 1.0.0-sifi.3 — 2026-09-05
 
